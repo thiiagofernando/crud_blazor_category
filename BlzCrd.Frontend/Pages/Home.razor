@@ -1,7 +1,49 @@
 ﻿@page "/"
+@using BlzCrd.Frontend.Models
+@using BlzCrd.Frontend.Services
+@inject CategoryService CategoryService
 
 <PageTitle>Home</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1>Categories</h1>
 
-Welcome to your new app.
+<ul>
+    @foreach (var item in _categories)
+    {
+    <li>@item.Title</li>
+    }
+</ul>
+
+<button class="btn btnprimary" @onclick="CreateAsync">
+    Criar
+</button>
+
+<button class="btn btnprimary" @onclick="ListAsync">
+    Listar
+</button>
+
+@code {
+    private List<Category> _categories = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ListAsync();
+    }
+    private async Task ListAsync()
+    {
+        _categories = await CategoryService.GetAsync();
+    }
+
+    private async Task CreateAsync()
+    {
+        var category = new Category
+        {
+            Id = 0,
+            Title = $"Nova categoria {Guid.NewGuid()}",
+            Description = $"Descrição da Categoria {Guid.NewGuid()}"
+        };
+        await CategoryService.CreateAsync(category);
+        await ListAsync();
+    }
+
+}
